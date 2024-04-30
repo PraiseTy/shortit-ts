@@ -27,6 +27,14 @@
     "quotes": "off",
     "unicorn/prevent-abbreviations": "off",
     "implicit-arrow-linebreak": "off",
-    "function-paren-newline": "off"
+    "function-paren-newline": "off",
+    "import/extensions": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts"]
+      }
+    }
   }
 }
