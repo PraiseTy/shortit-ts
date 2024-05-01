@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
-import logger from '../logging/logger';
+import logger from './logging/index';
 
 dotenv.config();
 
