@@ -14,7 +14,9 @@ interface Colours {
 
 const colors: Colours = {
   info: chalk.green,
-  error: chalk.red
+  error: chalk.red,
+  warn: chalk.yellow,
+  debug: chalk.cyan
 };
 
 const logFormat = winston.format.printf(({ level, message, timestamp }) => {
@@ -22,7 +24,7 @@ const logFormat = winston.format.printf(({ level, message, timestamp }) => {
   return `${timestamp} ${coloredLevel}: ${message}`;
 });
 const logger = winston.createLogger({
-  level: 'info',
+  level: 'debug',
   format: winston.format.combine(winston.format.timestamp(), logFormat),
 
   transports: [
