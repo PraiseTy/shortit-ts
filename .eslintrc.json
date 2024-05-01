@@ -28,7 +28,9 @@
     "unicorn/prevent-abbreviations": "off",
     "implicit-arrow-linebreak": "off",
     "function-paren-newline": "off",
-    "import/extensions": "off"
+    "import/no-extraneous-dependencies": "off",
+    "import/extensions": "off",
+    "import/no-unresolved": "off"
   },
   "settings": {
     "import/resolver": {
