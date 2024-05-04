@@ -32,7 +32,8 @@
     "import/extensions": "off",
     "import/no-unresolved": "off",
     "no-param-reassign": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "object-curly-newline": "off"
   },
   "settings": {
     "import/resolver": {
