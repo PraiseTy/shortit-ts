@@ -14,7 +14,7 @@ const createShortUrls = async (req: Request, res: Response) => {
     if (existingLongUrl && existingLongUrl.originalUrl === url) {
       return res
         .status(HTTP_ERRORS.BAD_REQUEST)
-        .json({ message: 'Shortened url already exists', shorturl: existingLongUrl.shortUrl });
+        .json({ message: 'Shortened url already exists', shortUrl: existingLongUrl.shortUrl });
     }
 
     const shortId = generateShortId();
@@ -36,7 +36,7 @@ const createShortUrls = async (req: Request, res: Response) => {
     });
     return res
       .status(HTTP_ERRORS.CREATED)
-      .json({ message: 'Url shortened successfully', data: { shorturl: shortUrls } });
+      .json({ message: 'Url shortened successfully', data: { shortUrl: shortUrls } });
   } catch (error) {
     logger.error(`Error creating short url: ${error}`);
     return res.status(HTTP_ERRORS.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
