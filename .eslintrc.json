@@ -30,7 +30,9 @@
     "function-paren-newline": "off",
     "import/no-extraneous-dependencies": "off",
     "import/extensions": "off",
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "off",
+    "no-param-reassign": "off",
+    "no-underscore-dangle": "off"
   },
   "settings": {
     "import/resolver": {

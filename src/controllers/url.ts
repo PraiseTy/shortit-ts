@@ -1,44 +1,32 @@
 import { Request, Response } from 'express';
-import { customAlphabet } from 'nanoid';
 import Url from '../models/url';
-import { BASE_URL, HTTP_ERRORS } from '../constant';
+import { BASE_URL, HTTP_ERRORS, generateShortId } from '../utils';
 import logger from '../logger/index';
 
 const createShortUrls = async (req: Request, res: Response) => {
   try {
     const { url, customName } = req.body;
-    let shortUrls;
-    const generateShortId = customAlphabet(
-      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',
-      5
-    );
 
-    if (!url) {
-      return res.status(HTTP_ERRORS.BAD_REQUEST).json({ error: 'Original Url is required' });
-    }
-    const existingLongUrl = await Url.findOne({ originalUrl: url });
-    if (existingLongUrl) {
+    const existingLongUrl = await Url.findOne({
+      $or: [{ originalUrl: url }, { customName }]
+    });
+
+    if (existingLongUrl && existingLongUrl.originalUrl === url) {
       return res
-        .status(200)
+        .status(HTTP_ERRORS.BAD_REQUEST)
         .json({ message: 'Shortened url already exists', shorturl: existingLongUrl.shortUrl });
     }
 
+    const shortId = generateShortId();
+    let shortUrls = `${BASE_URL}/${shortId}`;
+
     if (customName) {
-      const trimmedName = customName.split(' ').join('');
-      if (trimmedName.length < 5) {
-        return res
-          .status(HTTP_ERRORS.BAD_REQUEST)
-          .json({ error: 'Custom name must be at least five letters' });
-      }
-      const customNamewithDashes = customName.split(' ').join('-');
-      shortUrls = `${BASE_URL}/${customNamewithDashes}`;
-      const existingCustomName = await Url.findOne({ customName });
-      if (existingCustomName) {
+      const customNameWithDashes = customName.split(' ').join('-');
+      shortUrls = `${BASE_URL}/${customNameWithDashes}`;
+
+      if (existingLongUrl && customName === existingLongUrl.customName) {
         return res.status(HTTP_ERRORS.BAD_REQUEST).json({ error: 'Custom name already exists' });
       }
-    } else {
-      const shortId = generateShortId();
-      shortUrls = `${BASE_URL}/${shortId}`;
     }
 
     await Url.create({
@@ -55,9 +43,9 @@ const createShortUrls = async (req: Request, res: Response) => {
   }
 };
 
-const getAllUrls = async (req: Request, res: Response) => {
+const getAllUrls = async (_: Request, res: Response) => {
   try {
-    const urls = await Url.find({}, { __v: 0 }).lean();
+    const urls = await Url.find({});
     return res.status(HTTP_ERRORS.OK).json(urls);
   } catch (error) {
     logger.error(`Error retrieving all urls: ${error}`);
