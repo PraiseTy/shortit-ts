@@ -97,9 +97,9 @@ const editUrl = async (req: Request, res: Response) => {
       message: 'Url updated successfully',
       data: {
         id,
-        customName: customName || updateUrls.customName,
-        originalUrl: url || updateUrls.originalUrl,
-        shortUrl: shortUrls || updateUrls.shortUrl,
+        customName: updateUrls.customName,
+        originalUrl: updateUrls.originalUrl,
+        shortUrl: updateUrls.shortUrl,
         createdAt: updateUrls.createdAt
       }
     });
@@ -130,7 +130,7 @@ const deleteUrl = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    logger.error(`Error occured while deleting url: ${error}`);
+    logger.error(`Error occurred while deleting url: ${error}`);
     return res
       .status(HTTP_ERRORS.INTERNAL_SERVER_ERROR)
       .json({ error: 'There was a problem deleting url' });
