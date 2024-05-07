@@ -71,4 +71,70 @@ const getUrl = async (req: Request, res: Response) => {
   }
 };
 
-export { createShortUrls, getAllUrls, getUrl };
+const editUrl = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { customName, url } = req.body;
+    let shortUrls;
+    const filter = { _id: id };
+
+    if (customName) {
+      const customNameWithDashes = customName.split(' ').join('-');
+      shortUrls = `${BASE_URL}/${customNameWithDashes}`;
+    }
+
+    const updateUrls = await Url.findOneAndUpdate(filter, {
+      customName,
+      shortUrl: shortUrls,
+      originalUrl: url
+    });
+
+    if (!updateUrls) {
+      return res.status(HTTP_ERRORS.BAD_REQUEST).json({ error: 'Url cannot be found by Id' });
+    }
+
+    return res.status(HTTP_ERRORS.OK).json({
+      message: 'Url updated successfully',
+      data: {
+        id,
+        customName: updateUrls.customName,
+        originalUrl: updateUrls.originalUrl,
+        shortUrl: updateUrls.shortUrl,
+        createdAt: updateUrls.createdAt
+      }
+    });
+  } catch (error) {
+    logger.error(`Error occurred while updating url: ${error}`);
+    return res
+      .status(HTTP_ERRORS.INTERNAL_SERVER_ERROR)
+      .json({ error: 'There was a problem updating the url' });
+  }
+};
+
+const deleteUrl = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const url = await Url.findOneAndDelete({ _id: id });
+
+    if (!url) {
+      return res.status(HTTP_ERRORS.BAD_REQUEST).json({ error: 'Url cannot be found with Id' });
+    }
+    return res.status(HTTP_ERRORS.OK).json({
+      message: 'Url deleted successfully',
+      data: {
+        id,
+        customName: url.customName,
+        originalUrl: url.originalUrl,
+        shortUrl: url.shortUrl,
+        createdAt: url.createdAt
+      }
+    });
+  } catch (error) {
+    logger.error(`Error occurred while deleting url: ${error}`);
+    return res
+      .status(HTTP_ERRORS.INTERNAL_SERVER_ERROR)
+      .json({ error: 'There was a problem deleting url' });
+  }
+};
+
+export { createShortUrls, getAllUrls, getUrl, editUrl, deleteUrl };
