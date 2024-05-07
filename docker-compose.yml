@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  api:
+    build: .
+    volumes:
+      - ./:/src/
+    ports:
+      - '3001:3001'
+    command: ['npm', 'start']
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongodb_data:/data/db
+volumes:
+  mongodb_data:
