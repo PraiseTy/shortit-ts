@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Url from '../models/url';
 import { BASE_URL, HTTP_ERRORS, generateShortId } from '../utils';
 import logger from '../logger/index';
+import { NotFoundError } from '../types/errors';
 
 const createShortUrls = async (req: Request, res: Response) => {
   try {
@@ -56,19 +57,12 @@ const getAllUrls = async (_: Request, res: Response) => {
 };
 
 const getUrl = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const url = await Url.findById(id);
-    if (!url) {
-      return res.status(HTTP_ERRORS.NOT_FOUND).json({ error: 'Url not found' });
-    }
-    return res.status(HTTP_ERRORS.OK).json(url);
-  } catch (error) {
-    logger.error(`Error retrieving single url: ${error}`);
-    return res
-      .status(HTTP_ERRORS.INTERNAL_SERVER_ERROR)
-      .json({ 'Error retrieving single url: ': error });
+  const { id } = req.params;
+  const url = await Url.findById(id);
+  if (!url) {
+    throw new NotFoundError('Url not found');
   }
+  return res.status(HTTP_ERRORS.OK).json(url);
 };
 
 const editUrl = async (req: Request, res: Response) => {
