@@ -9,10 +9,10 @@ const asyncMiddleware = (fn: RequestHandler) => (req: Request, res: Response, ne
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-router.post('/shorten', validateUrl, validateRequest, createShortUrls);
+router.post('/shorten', validateUrl, validateRequest, asyncMiddleware(createShortUrls));
 router.get('/urls', getAllUrls);
 router.get('/urls/:id', validateId, validateRequest, asyncMiddleware(getUrl));
-router.put('/urls/:id', validateId, validateEditUrl, validateRequest, editUrl);
-router.delete('/urls/:id', validateId, validateRequest, deleteUrl);
+router.put('/urls/:id', validateId, validateEditUrl, validateRequest, asyncMiddleware(editUrl));
+router.delete('/urls/:id', validateId, validateRequest, asyncMiddleware(deleteUrl));
 
 export default router;
