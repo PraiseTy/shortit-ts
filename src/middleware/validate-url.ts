@@ -1,6 +1,6 @@
 import { body, validationResult, param } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
-import { HTTP_ERRORS } from '../utils';
+import { RequestValidationError } from '../types/errors';
 
 const validateUrl = [
   body('url')
@@ -17,10 +17,10 @@ const validateUrl = [
 
 const validateId = param('id').isMongoId().withMessage('Url Id must be a valid MongoDB Id');
 
-const validateRequest = (req: Request, res: Response, next: NextFunction) => {
+const validateRequest = (req: Request, _: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(HTTP_ERRORS.BAD_REQUEST).json({ errors: errors.array() });
+    return new RequestValidationError(errors.array());
   }
   return next();
 };
