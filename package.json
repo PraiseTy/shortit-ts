@@ -8,7 +8,7 @@
     "dev": "nodemon src/app.ts",
     "tsc": "tsc",
     "lint": "eslint . --ext .ts,.js && tsc --noEmit",
-    "build": "rimraf ./dist && tsc && docker build -t shorit-ts-server",
+    "build": "rimraf ./dist && tsc",
     "start": "yarn build && node dist/app.js",
     "docker-start": "docker-compose up -d",
     "docker-stop": "docker-compose down",
