@@ -9,7 +9,12 @@
     "tsc": "tsc",
     "lint": "eslint . --ext .ts,.js && tsc --noEmit",
     "build": "rimraf ./dist && tsc",
-    "start": "yarn build && node dist/app.js"
+    "start": "yarn build && node dist/app.js",
+    "docker-start": "docker-compose up -d",
+    "docker-stop": "docker-compose down",
+    "docker-build": "docker-compose build",
+    "docker-start-build": "docker-compose up -d --build",
+    "docker-start-server-logs": "docker-compose up -d && docker-compose logs -f server"
   },
   "author": "",
   "license": "ISC",
