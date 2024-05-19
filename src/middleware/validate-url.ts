@@ -20,7 +20,7 @@ const validateId = param('id').isMongoId().withMessage('Url Id must be a valid M
 const validateRequest = (req: Request, _: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return new RequestValidationError(errors.array());
+    return next(new RequestValidationError(errors.array()));
   }
   return next();
 };

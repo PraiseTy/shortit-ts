@@ -25,12 +25,14 @@ const createShortUrls = async (req: Request, res: Response) => {
     }
   }
 
-  await Url.create({
+  const shortenedUrl = await Url.create({
     originalUrl: url,
     shortUrl: shortUrls,
     customName
   });
-  return res.status(HTTP_ERRORS.CREATED).json({ message: 'Url shortened successfully', data: { shortUrl: shortUrls } });
+  return res
+    .status(HTTP_ERRORS.CREATED)
+    .json({ message: 'Url shortened successfully', data: { id: shortenedUrl._id, shortUrl: shortUrls } });
 };
 
 const getAllUrls = async (_: Request, res: Response) => {
@@ -53,16 +55,23 @@ const editUrl = async (req: Request, res: Response) => {
   let shortUrls;
   const filter = { _id: id };
 
+  const existingUrl = await Url.findOne({ customName });
+
   if (customName) {
     const customNameWithDashes = customName.split(' ').join('-');
     shortUrls = `${BASE_URL}/${customNameWithDashes}`;
+
+    if (existingUrl && existingUrl.customName === customName) {
+      throw new BadRequestError('Custom name already exists');
+    }
   }
 
   const updateUrls = await Url.findOneAndUpdate(filter, {
-    customName,
-    shortUrl: shortUrls,
-    originalUrl: url
-  });
+      customName,
+      shortUrl: shortUrls,
+      originalUrl: url
+    }, { new: true }
+  );
 
   if (!updateUrls) {
     throw new NotFoundError('Url cannot be found by Id');
