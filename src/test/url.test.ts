@@ -54,6 +54,11 @@ describe('Shortener', () => {
     it('should return an error if the request body is invalid', async () => {
       const res1 = await factory.app.post('/shorten').send({});
       expect(res1.status).toBe(HTTP_ERRORS.BAD_REQUEST);
+      expect(res1.body.errors).toHaveLength(2);
+
+      const res2 = await factory.app.post('/shorten').send({ url: 'google beats everything' });
+      expect(res2.status).toBe(HTTP_ERRORS.BAD_REQUEST);
+      expect(res2.body.errors).toHaveLength(1);
     });
 
     it('should return the right message if original url already exists', async () => {
@@ -66,6 +71,7 @@ describe('Shortener', () => {
         .post('/shorten')
         .send({ url: 'https://www.google.com/search?q=google+url+shortener' });
       expect(res2.status).toBe(HTTP_ERRORS.BAD_REQUEST);
+      expect(res2.body.errors[0].message).toContain('Shortened url already exists');
     });
 
     it('should return an error if custom name already exists', async () => {
@@ -78,6 +84,7 @@ describe('Shortener', () => {
         .post('/shorten')
         .send({ url: 'https://www.youtube.com/watch22?v=xZLKALpvdBE', customName: 'praise' });
       expect(res2.status).toBe(HTTP_ERRORS.BAD_REQUEST);
+      expect(res2.body.errors[0].message).toBe('Custom name already exists');
     });
   });
 
@@ -108,6 +115,7 @@ describe('Shortener', () => {
       const nonExistentId = '609c6a0f0ac8cd1e58fd6d87';
       const response = await factory.app.get(`/urls/${nonExistentId}`);
       expect(response.status).toBe(HTTP_ERRORS.NOT_FOUND);
+      expect(response.body.errors[0].message).toBe('Url not found');
     });
   });
 
@@ -141,6 +149,7 @@ describe('Shortener', () => {
         .put(`/urls/${nonExistentId}`)
         .send({ url: 'https://www.boredbutton.com/lorem/ipsum/dolor/sit/amet' });
       expect(response.status).toBe(HTTP_ERRORS.NOT_FOUND);
+      expect(response.body.errors[0].message).toBe('Url cannot be found by Id');
     });
 
     it('should return an error if the request body is invalid', async () => {
@@ -152,6 +161,13 @@ describe('Shortener', () => {
       const urlId = res1.body.data.id;
       const res2 = await factory.app.put(`/urls/${urlId}`).send({});
       expect(res2.status).toBe(HTTP_ERRORS.BAD_REQUEST);
+      expect(res2.body.errors).toHaveLength(1);
+      expect(res2.body.errors[0].message).toBe('Request body should not be empty');
+
+      const res3 = await factory.app.put(`/urls/${urlId}`).send({ url: 'letter to myself' });
+      expect(res3.status).toBe(HTTP_ERRORS.BAD_REQUEST);
+      expect(res3.body.errors).toHaveLength(1);
+      expect(res3.body.errors[0].message).toBe('Invalid URL Format');
     });
 
     it('should return an error if the custom name already exists', async () => {
@@ -165,6 +181,7 @@ describe('Shortener', () => {
         .put(`/urls/${urlId}`)
         .send({ url: 'https://www.madeupwebsitefortestingtimestwo.com', customName: 'fast times' });
       expect(res2.status).toBe(HTTP_ERRORS.BAD_REQUEST);
+      expect(res2.body.errors[0].message).toBe('Custom name already exists');
     });
   });
 
@@ -193,12 +210,14 @@ describe('Shortener', () => {
       const nonExistentId = '609c6a0f0ac8cd1e58fd6d87';
       const res1 = await factory.app.delete(`/urls/${nonExistentId}`);
       expect(res1.status).toBe(HTTP_ERRORS.NOT_FOUND);
+      expect(res1.body.errors[0].message).toBe('Url cannot be found with Id');
     });
 
     it('should return an error if the url id is invalid', async () => {
       const invalidId = '609c6a0f0ac8cd1e58fd6d87ddddd';
       const res1 = await factory.app.delete(`/urls/${invalidId}`);
       expect(res1.status).toBe(HTTP_ERRORS.BAD_REQUEST);
+      expect(res1.body.errors[0].message).toBe('Url Id must be a valid MongoDB Id');
     });
   });
 });

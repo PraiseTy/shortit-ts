@@ -5,6 +5,7 @@ import { Server, createServer } from 'node:http';
 import routes from '../routes/url';
 import { testDatabaseConfig } from './setup/jest-setup';
 import logger from '../logger';
+import { errorHandler } from '../middleware/error-handler';
 
 // eslint-disable-next-line max-len
 const MONGO_URL = `mongodb://${testDatabaseConfig.user}:${testDatabaseConfig.password}@localhost:${testDatabaseConfig.port}/${testDatabaseConfig.database}?authSource=admin`;
@@ -35,6 +36,7 @@ export class TestFactory {
       this._app.use(express.json());
       this._app.use(express.urlencoded({ extended: true }));
       this._app.use('/', routes);
+      this._app.use(errorHandler);
       this._server = createServer(this._app).listen(3010);
     } catch (error) {
       logger.error(error);
