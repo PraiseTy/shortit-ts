@@ -1,4 +1,6 @@
 import { body } from 'express-validator';
+import { NextFunction, Request, Response } from 'express';
+import { BadRequestError } from '../types/errors';
 
 const validateEditUrl = [
   body('url')
@@ -9,7 +11,14 @@ const validateEditUrl = [
   body('customName')
     .optional()
     .isLength({ min: 5 })
-    .withMessage('Custom name must be at least five letters')
+    .withMessage('Custom name must be at least five letters'),
 ];
 
-export default validateEditUrl;
+const validateEditRequest = (req: Request, _: Response, next: NextFunction) => {
+  if (req.body && !req.body.customName && !req.body.url) {
+    throw new BadRequestError('Request body should not be empty');
+  }
+  return next();
+};
+
+export { validateEditUrl, validateEditRequest };
